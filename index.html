@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Artem — Launch Token</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   ARTEM DESIGN TOKENS — from artemtracker.io
+   Very dark near-black, white borders,
+   white text, Inter, green live accent
+═══════════════════════════════════════ */
+:root {
+  /* Backgrounds — warm very dark, like the screenshot */
+  --bg-page:    #0a0a0b;
+  --bg-modal:   #0f0f11;
+  --bg-card:    #161618;
+  --bg-input:   #131315;
+  --bg-hover:   #1c1c1f;
+  --bg-active:  #222226;
+
+  /* Borders — extremely subtle, almost invisible */
+  --border:     rgba(255,255,255,0.05);
+  --border-md:  rgba(255,255,255,0.09);
+  --border-hi:  rgba(255,255,255,0.18);
+  --border-btn: rgba(255,255,255,0.1);
+
+  /* Text */
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(255,255,255,0.5);
+  --text-muted:     rgba(255,255,255,0.28);
+  --text-dim:       rgba(255,255,255,0.14);
+
+  /* Accent */
+  --green:      #3ECF8E;
+  --green-bg:   rgba(62,207,142,0.1);
+  --green-border: rgba(62,207,142,0.25);
+
+  /* States */
+  --red:        #FF4D4D;
+  --amber:      #F59E0B;
+  --blue:       #60A5FA;
+
+  /* Typography */
+  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Radii — sharp like the screenshot */
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-xl: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: var(--bg-page);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "cv11", "ss01";
+}
+
+/* Demo wrapper */
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+body::before {
+  content: 'CT Feed';
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+  color: rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+/* ═══════════════════════════════════════
+   OVERLAY
+═══════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+/* ════════════════════════════════════════
+   MODAL — web3 gradient border
+════════════════════════════════════════ */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin-border {
+  from { --angle: 0deg; }
+  to   { --angle: 360deg; }
+}
+
+.modal-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 548px;
+  border-radius: calc(var(--r-xl) + 2px);
+  box-shadow: 0 48px 120px rgba(0,0,0,0.95);
+}
+
+.modal-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--r-xl) + 2px);
+  padding: 2px;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    rgba(255,255,255,0.0)  0%,
+    rgba(255,255,255,0.0)  20%,
+    rgba(255,255,255,0.18) 27%,
+    rgba(255,255,255,0.32) 30%,
+    rgba(255,255,255,0.18) 33%,
+    rgba(255,255,255,0.0)  40%,
+    rgba(255,255,255,0.0)  70%,
+    rgba(255,255,255,0.18) 77%,
+    rgba(255,255,255,0.32) 80%,
+    rgba(255,255,255,0.18) 83%,
+    rgba(255,255,255,0.0)  90%,
+    rgba(255,255,255,0.0)  100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spin-border 5s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.modal {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-height: 92vh;
+  background: var(--bg-modal);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.mh {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.mh-l {}
+.mh-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+}
+.mh-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 400;
+}
+.mh-r { display: flex; align-items: center; gap: 8px; }
+
+/* Wallet pill — artemtracker style */
+.wallet-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-btn);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+.wallet-pill:hover { border-color: var(--border-hi); }
+.wp-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(62,207,142,0.6);
+  flex-shrink: 0;
+}
+.wp-addr { font-size: 10.5px; color: var(--text-muted); }
+.wp-bal { font-weight: 600; }
+.wp-arrow { font-size: 10px; color: var(--text-muted); }
+
+/* Close btn */
+.close-btn {
+  width: 30px; height: 30px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.close-btn:hover { border-color: var(--border-md); color: var(--text-primary); }
+.close-btn svg { width: 12px; height: 12px; }
+
+/* ── Body ── */
+.mb { flex: 1; overflow-y: auto; padding: 16px 20px 8px; }
+
+/* ── Field label ── */
+.lbl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+.lbl-right {
+  margin-left: auto;
+  font-weight: 500;
+  font-size: 9.5px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-dim);
+}
+.lbl-right b { color: var(--text-secondary); }
+
+/* Name/Symbol unified label bar */
+.ns-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.ns-half {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ns-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.ns-count {
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.ns-count b { color: var(--text-secondary); font-weight: 600; }
+.ns-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--border-md);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+/* Sync checkbox */
+.ns-sync {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ns-sync-box {
+  width: 13px; height: 13px;
+  border: 1.5px solid var(--border-md);
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.13s;
+}
+.ns-sync.on .ns-sync-box {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
+.ns-sync.on .ns-sync-box::after {
+  content: '✓';
+  font-size: 8px; font-weight: 800; color: #000;
+}
+.ns-sync-lbl {
+  font-size: 10px; font-weight: 500;
+  color: var(--text-dim);
+  transition: color 0.13s;
+  letter-spacing: 0; text-transform: none;
+}
+.ns-sync.on .ns-sync-lbl { color: var(--text-secondary); }
+
+/* Sync link */
+.sync-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.sync-link:hover { color: var(--text-primary); }
+.sync-link svg { width: 10px; height: 10px; }
+
+/* View post link */
+.view-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600;
+  text-transform: none; letter-spacing: 0;
+  color: var(--text-secondary);
+  cursor: pointer; transition: color 0.15s;
+  margin-left: auto;
+}
+.view-link:hover { color: var(--text-primary); }
+.view-link svg { width: 10px; height: 10px; }
+
+/* Suggestion tag chips */
+.chips { display: flex; align-items: center; gap: 4px; }
+.chip {
+  padding: 2px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.chip:hover { border-color: var(--border-md); color: var(--text-primary); }
+.chip.on {
+  background: var(--bg-active);
+  border-color: var(--border-hi);
+  color: var(--text-primary);
+}
+.chip-edit {
+  width: 20px; height: 20px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all 0.13s;
+}
+.chip-edit:hover { border-color: var(--border-md); color: var(--text-secondary); }
+.chip-edit svg { width: 9px; height: 9px; }
+
+/* Grid layouts */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.row { margin-bottom: 12px; }
+
+/* ── Input ── */
+.fi-wrap { position: relative; }
+.fi {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 9px 36px 9px 12px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fi::placeholder { color: var(--text-dim); }
+.fi:focus {
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.03);
+}
+.fi-sfx {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.fi-sfx svg { width: 13px; height: 13px; }
+.fi-sfx.click { pointer-events: auto; cursor: pointer; transition: color 0.15s; }
+.fi-sfx.click:hover { color: var(--text-primary); }
+
+/* italic symbol field */
+.fi-italic { font-style: italic; }
+
+/* ── Image section ── */
+.img-row { display: flex; align-items: flex-start; gap: 8px; }
+.img-thumbs { display: flex; gap: 6px; }
+
+.img-thumb {
+  width: 66px; height: 66px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+  background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+}
+.img-thumb:hover { border-color: var(--border-md); }
+.img-thumb.sel { border-color: rgba(255,255,255,0.45); }
+.img-thumb .check {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text-primary);
+  display: none; align-items: center; justify-content: center;
+}
+.img-thumb.sel .check { display: flex; }
+.img-thumb .check svg { width: 8px; height: 8px; color: #000; }
+
+.img-drop-zone {
+  width: 66px; height: 66px;
+  border-radius: var(--r-md);
+  border: 1px dashed var(--border-md);
+  background: var(--bg-input);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+}
+.img-drop-zone:hover { border-color: var(--border-hi); background: var(--bg-hover); }
+.img-drop-zone svg { width: 14px; height: 14px; color: var(--text-dim); }
+.img-drop-zone span { font-size: 9px; color: var(--text-dim); text-align: center; line-height: 1.3; }
+
+/* AI tool buttons */
+.ai-tools { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+.ai-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 11px; font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer; font-family: var(--font);
+  transition: all 0.13s;
+}
+.ai-btn:hover { border-color: var(--border-md); color: var(--text-primary); }
+.ai-btn svg { width: 11px; height: 11px; }
+
+/* Image search row */
+.isearch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.isearch-lbl { font-size: 9.5px; color: var(--text-dim); margin-bottom: 4px; }
+.isearch-field {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 7px 10px;
+  transition: border-color 0.15s;
+}
+.isearch-field:focus-within { border-color: var(--border-md); }
+.isearch-field svg { width: 11px; height: 11px; color: var(--text-dim); flex-shrink: 0; }
+.isearch-field input {
+  background: none; border: none; outline: none;
+  font-size: 11.5px; font-family: var(--font);
+  color: var(--text-primary); width: 100%;
+}
+.isearch-field input::placeholder { color: var(--text-dim); }
+
+/* ── Divider ── */
+.div { height: 1px; background: var(--border); margin: 12px 0; }
+
+/* ── Platform buttons — artemtracker style ── */
+.pf-row { display: flex; align-items: center; gap: 6px; }
+.pf {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: 12px; font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer; font-family: var(--font);
+  transition: all 0.13s;
+  white-space: nowrap;
+}
+.pf:hover { border-color: var(--border-md); color: var(--text-primary); }
+/* Active platform — Artem uses a white outline + slight bg */
+.pf.on {
+  background: var(--bg-active);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.pf-logo {
+  width: 11px; height: 11px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+  width: 32px; height: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  transition: all 0.13s; margin-left: auto; flex-shrink: 0;
+}
+.pf-more:hover { border-color: var(--border-md); color: var(--text-primary); }
+.pf-more svg { width: 13px; height: 13px; }
+
+/* ── Option rows (checkbox grid) ── */
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all 0.13s;
+}
+.opt:hover { border-color: var(--border-md); }
+.opt.on {
+  background: var(--bg-active);
+  border-color: var(--border-hi);
+}
+.opt-cb {
+  width: 15px; height: 15px;
+  border: 1.5px solid var(--border-md);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.13s;
+}
+.opt.on .opt-cb {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
+.opt.on .opt-cb::after {
+  content: '✓';
+  font-size: 8px; font-weight: 800; color: #000;
+}
+.opt-ico { width: 14px; height: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+.opt-ico svg { width: 14px; height: 14px; }
+.opt-name {
+  font-size: 12px; font-weight: 500;
+  color: var(--text-muted);
+  flex: 1;
+  transition: color 0.13s;
+}
+.opt.on .opt-name { color: var(--text-primary); }
+.opt-arrow { color: var(--text-dim); flex-shrink: 0; }
+.opt-arrow svg { width: 11px; height: 11px; }
+
+/* Expanded opt panel */
+.opt-expand {
+  display: none;
+  grid-column: span 2;
+  padding: 10px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.opt-expand.show { display: block; }
+
+/* ── SOL amount row ── */
+.sol-row { display: flex; gap: 5px; }
+.sol-amt {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.13s;
+}
+.sol-amt:hover { border-color: var(--border-md); background: var(--bg-hover); }
+.sol-amt:active { transform: scale(0.97); }
+.sol-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sol-logo {
+  width: 12px;
+  height: 10px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.sol-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: color 0.13s;
+  letter-spacing: -0.02em;
+}
+.sol-amt:hover .sol-val { color: var(--text-primary); }
+.sol-row.locked .sol-amt {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.sol-row.locked .sol-custom {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.sol-row.editing .sol-amt {
+  cursor: text;
+  border-color: var(--border-md);
+}
+.sol-row.editing .sol-amt:hover {
+  border-color: var(--border-hi);
+}
+.sol-pencil-input {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 38px;
+  text-align: center;
+  letter-spacing: -0.02em;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+.sol-pencil-input::-webkit-outer-spin-button,
+.sol-pencil-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.sol-pencil.active {
+  border-color: var(--border-hi);
+  color: var(--text-primary);
+}
+.sol-custom {
+  width: 38px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  transition: all 0.13s; flex-shrink: 0;
+}
+.sol-custom:hover { border-color: var(--border-md); color: var(--text-primary); }
+.sol-custom svg { width: 12px; height: 12px; }
+
+/* ── Google image search results ── */
+.gsearch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 6px;
+}
+.gsearch-item {
+  aspect-ratio: 1;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: border-color 0.13s, transform 0.1s;
+  background: var(--bg-card);
+}
+.gsearch-item:hover { border-color: var(--border-hi); transform: scale(1.04); }
+.gsearch-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gsearch-msg { font-size: 10.5px; color: var(--text-dim); padding: 8px 0; text-align: center; }
+
+/* ── ASCII popup ── */
+.ascii-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  align-items: center; justify-content: center;
+  padding: 16px;
+}
+.ascii-overlay.show { display: flex; }
+.ascii-modal {
+  width: 100%; max-width: 500px;
+  background: var(--bg-modal);
+  border: 1px solid var(--border-md);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.9);
+}
+.ascii-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.ascii-title { font-size: 15px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+.ascii-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.ascii-body { padding: 16px 18px 18px; }
+.ascii-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ascii-card {
+  position: relative;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.13s;
+  aspect-ratio: 1;
+  background: var(--bg-card);
+}
+.ascii-card:hover { border-color: var(--border-md); }
+.ascii-card.sel { border-color: rgba(255,255,255,0.5); }
+.ascii-canvas { width: 100%; height: 100%; display: block; }
+.ascii-check {
+  display: none;
+  position: absolute; bottom: 5px; right: 5px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--text-primary);
+  align-items: center; justify-content: center;
+}
+.ascii-check svg { width: 9px; height: 9px; color: #000; }
+.ascii-card.sel .ascii-check { display: flex; }
+.ascii-use {
+  width: 100%; padding: 11px;
+  background: var(--text-primary); color: #000;
+  border: none; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 700;
+  font-family: var(--font); cursor: pointer;
+  transition: opacity 0.13s;
+}
+.ascii-use:disabled { opacity: 0.3; cursor: not-allowed; }
+.ascii-use:not(:disabled):hover { opacity: 0.85; }
+
+</style>
+</head>
+<body>
+
+<div class="overlay">
+<div class="modal-wrap">
+<div class="modal">
+
+  <!-- ════ HEADER ════ -->
+  <div class="mh">
+    <div class="mh-l">
+      <div class="mh-title">Launch Token</div>
+      <div class="mh-sub">Configure your token and launch it instantly</div>
+    </div>
+    <div class="mh-r">
+      <div class="wallet-pill">
+        <div class="wp-dot"></div>
+        <span class="wp-addr">7xKp…mR4f</span>
+        <span class="wp-bal">12.4 SOL</span>
+        <span class="wp-arrow">▾</span>
+      </div>
+      <div class="close-btn" onclick="document.querySelector('.overlay').style.display='none'">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M3 3l10 10M13 3L3 13"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ BODY ════ -->
+  <div class="mb">
+
+    <!-- NAME + SYMBOL -->
+    <div class="row">
+      <div class="ns-bar">
+        <div class="ns-half">
+          <span class="ns-tag">NAME</span>
+          <div class="ns-count"><b id="nc">0</b>/32</div>
+        </div>
+        <div class="ns-half">
+          <span class="ns-tag">SYMBOL</span>
+          <div class="ns-sync" id="sync-toggle" onclick="toggleSync()">
+            <div class="ns-sync-box" id="sync-box"></div>
+            <span class="ns-sync-lbl">Sync from name</span>
+          </div>
+          <div class="ns-count" style="margin-left:auto"><b id="sc">0</b>/13</div>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:6px">
+        <div class="fi-wrap">
+          <input class="fi" id="fname" type="text" placeholder="Token name" maxlength="32"
+            oninput="document.getElementById('nc').textContent=this.value.length;autoSync()"/>
+          <div class="fi-sfx">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3">
+              <text x="1" y="12" font-size="9" fill="currentColor" stroke="none" font-family="serif">A</text>
+              <text x="6" y="11" font-size="7" fill="currentColor" stroke="none" font-family="serif">文</text>
+              <text x="11" y="11" font-size="7" fill="currentColor" stroke="none" font-family="serif">あ</text>
+            </svg>
+          </div>
+        </div>
+        <div class="fi-wrap">
+          <input class="fi" id="fsym" type="text" placeholder="Symbol" maxlength="13"
+            oninput="document.getElementById('sc').textContent=this.value.length"/>
+          <div class="fi-sfx">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+              <line x1="4" y1="13" x2="12" y2="3"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEBSITE -->
+    <div class="row">
+      <div class="lbl">
+        Website (optional)
+      </div>
+      <div class="fi-wrap">
+        <input class="fi" type="url" placeholder="https://example.com"/>
+      </div>
+    </div>
+
+    <!-- POST URL -->
+    <div class="row">
+      <div class="lbl">
+        Post
+        <div class="view-link">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M10 2h4v4M14 2l-7 7M6 4H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-3"/>
+          </svg>
+          View Post
+        </div>
+      </div>
+      <div class="fi-wrap">
+        <input class="fi" id="fpost" type="url"
+          placeholder="https://x.com/username/status/..."
+          style="font-size:11.5px;padding-right:36px"/>
+        <div class="fi-sfx click" onclick="window.open(document.getElementById('fpost').value,'_blank')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13l10-10M8 3h5v5"/></svg>
+        </div>
+      </div>
+      <div style="margin-top:7px;display:flex;align-items:center;gap:5px;cursor:pointer" onclick="toggleDesc()">
+        <svg id="desc-chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10" style="color:var(--text-dim);transition:transform .15s"><path d="M4 6l4 4 4-4"/></svg>
+        <span style="font-size:11px;color:var(--text-dim);font-weight:500">Add Description</span>
+      </div>
+      <div id="desc-expand" style="display:none;margin-top:6px">
+        <textarea class="fi" placeholder="Description (optional)…" style="height:60px;resize:none;padding-top:8px;line-height:1.5"></textarea>
+      </div>
+    </div>
+
+    <!-- SELECT IMAGE -->
+    <div class="row">
+      <div class="lbl">
+        Select Image
+        <div class="ai-tools" style="margin-left:auto;margin-bottom:0">
+          <div class="ai-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2l1.5 4.5L14 8l-4.5 1.5L8 14l-1.5-4.5L2 8l4.5-1.5z"/></svg>AI</div>
+          <div class="ai-btn" onclick="openAscii()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="4" height="4" rx="1"/><rect x="10" y="2" width="4" height="4" rx="1"/><rect x="2" y="10" width="4" height="4" rx="1"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg>ASCII</div>
+        </div>
+      </div>
+      <div class="img-row">
+        <div class="img-thumbs" id="img-thumbs">
+          <div class="img-thumb sel" data-src="" onclick="pickImg(this)">
+            <div style="width:100%;height:100%;background:#1a1a1a;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><polygon points="12,3 22,21 2,21"/></svg></div>
+            <div class="check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1,6 4,9 11,2"/></svg></div>
+          </div>
+          <div class="img-thumb" data-src="" onclick="pickImg(this)">
+            <div style="width:100%;height:100%;background:#1a1a1a;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <div class="check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1,6 4,9 11,2"/></svg></div>
+          </div>
+        </div>
+        <div class="img-drop-zone" id="drop-zone" onclick="triggerUpload()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 2v8M4 6l4-4 4 4"/><path d="M2 13h12"/>
+          </svg>
+          <span>Click or drop<br/>image anywhere</span>
+        </div>
+      </div>
+      <!-- Coin Images + Google Images search -->
+      <div class="isearch-row" style="margin-top:8px">
+        <div>
+          <div class="isearch-lbl" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            Coin Images
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10" style="color:var(--text-dim)"><path d="M4 6l4 4 4-4"/></svg>
+          </div>
+          <div class="isearch-field">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+            <input type="text" id="csearch-input" placeholder="Type a name to search" oninput="debounceCSearch(this.value)"/>
+          </div>
+          <div id="csearch-results" class="gsearch-grid"></div>
+        </div>
+        <div>
+          <div class="isearch-lbl" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            Google Images
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="10" height="10" style="color:var(--text-dim)"><path d="M4 6l4 4 4-4"/></svg>
+          </div>
+          <div class="isearch-field">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+            <input type="text" id="gsearch-input" placeholder="Type a name to search" oninput="debounceGSearch(this.value)"/>
+          </div>
+          <div id="gsearch-results" class="gsearch-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="div"></div>
+
+    <!-- PLATFORM -->
+    <div class="pf-row row">
+      <div class="pf on" onclick="pickPf(this)"><img src="https://pump.fun/pump-logomark.svg?dpl=dpl_cWgJY4r2jeTXkaVVZsLpdg68y7Kq" class="pf-logo" alt="pump.fun"/>Pump</div>
+      <div class="pf" onclick="pickPf(this)"><img src="https://jsextraction.vercel.app/logos/bonk.svg" class="pf-logo" alt="bonk"/>Bonk</div>
+      <div class="pf" onclick="pickPf(this)"><img src="https://jsextraction.vercel.app/logos/bags.svg" class="pf-logo" alt="bags"/>Bags</div>
+      <div class="pf-more">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="4" cy="8" r="1" fill="currentColor"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="8" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- OPTIONS GRID -->
+    <div class="opts row" id="opts">
+
+      <div class="opt" onclick="toggleOpt(this,'ex-bundle')">
+        <div class="opt-cb"></div>
+        <span class="opt-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="5" height="5" rx="1"/><rect x="9" y="5" width="5" height="5" rx="1"/><path d="M7 7.5h2"/></svg></span>
+        <span class="opt-name">Bundle Mode</span>
+        <div class="opt-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div>
+      </div>
+
+      <div class="opt" onclick="toggleOpt(this,'ex-feesplit')">
+        <div class="opt-cb"></div>
+        <span class="opt-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 4h3M9 12h3"/><circle cx="4.5" cy="11.5" r="1.5"/><circle cx="11.5" cy="4.5" r="1.5"/></svg></span>
+        <span class="opt-name">Fee Split</span>
+        <div class="opt-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div>
+      </div>
+
+      <div class="opt-expand" id="ex-bundle">
+        <div class="g2" style="gap:8px">
+          <div>
+            <div class="isearch-lbl" style="margin-bottom:4px">Bundle wallets</div>
+            <select style="width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;font-size:12px;font-family:var(--font);color:var(--text-primary);outline:none;-webkit-appearance:none">
+              <option>Main + 2 wallets</option><option>Main only</option><option>Custom…</option>
+            </select>
+          </div>
+          <div>
+            <div class="isearch-lbl" style="margin-bottom:4px">Each buy</div>
+            <div class="fi-wrap">
+              <input class="fi" type="number" value="0.5" style="padding-right:36px"/>
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text-dim);font-family:monospace">SOL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt" onclick="toggleOpt(this,'ex-autotrade')">
+        <div class="opt-cb"></div>
+        <span class="opt-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M6 8l1.5 1.5L10 6"/></svg></span>
+        <span class="opt-name">Auto Trade</span>
+        <div class="opt-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div>
+      </div>
+
+      <div class="opt" onclick="toggleOpt(this,'ex-multi')">
+        <div class="opt-cb"></div>
+        <span class="opt-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v5M5 4l3-2 3 2M4 9h8M4 12h8"/></svg></span>
+        <span class="opt-name">Multi Deploy</span>
+        <div class="opt-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div>
+      </div>
+
+      <div class="opt-expand" id="ex-autotrade">
+        <div class="g2" style="gap:8px">
+          <div>
+            <div class="isearch-lbl" style="margin-bottom:4px">Auto-sell at</div>
+            <div class="fi-wrap">
+              <input class="fi" type="number" placeholder="2" style="padding-right:24px"/>
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text-dim);font-family:monospace">×</span>
+            </div>
+          </div>
+          <div>
+            <div class="isearch-lbl" style="margin-bottom:4px">Stop loss</div>
+            <div class="fi-wrap">
+              <input class="fi" type="number" placeholder="50" style="padding-right:24px"/>
+              <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text-dim);font-family:monospace">%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="opt" onclick="toggleOpt(this,'ex-cashback')">
+        <div class="opt-cb"></div>
+        <span class="opt-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="12" height="8" rx="1"/><path d="M2 7h12"/><circle cx="8" cy="10" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <span class="opt-name">Cashback</span>
+        <div class="opt-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div>
+      </div>
+
+      <div class="opt" onclick="toggleOpt(this,'ex-supply')">
+        <div class="opt-cb"></div>
+        <span class="opt-ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h10M3 8h10M3 11h6"/><path d="M11 9l3 2-3 2"/></svg></span>
+        <span class="opt-name">Supply Transfer</span>
+        <div class="opt-arrow"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg></div>
+      </div>
+
+      <div class="opt-expand" id="ex-cashback">
+        <span style="font-size:11.5px;color:var(--text-muted)">SOL cashback credited to your wallet after each successful deploy.</span>
+      </div>
+
+    </div>
+
+    <!-- DEV BUY PRESETS = DEPLOY -->
+    <div class="row">
+      <div class="sol-row" id="sol-row">
+        <div class="sol-amt" id="sol-0" onclick="pickSol(this, 0)">
+          <div class="sol-top"><img class="sol-logo" src="https://brandlogos.net/wp-content/uploads/2025/10/solana-logo_brandlogos.net_0evmb-512x446.png" alt="SOL"/><span class="sol-val" id="sv-0">0.1</span></div>
+        </div>
+        <div class="sol-amt" id="sol-1" onclick="pickSol(this, 1)">
+          <div class="sol-top"><img class="sol-logo" src="https://brandlogos.net/wp-content/uploads/2025/10/solana-logo_brandlogos.net_0evmb-512x446.png" alt="SOL"/><span class="sol-val" id="sv-1">0.5</span></div>
+        </div>
+        <div class="sol-amt" id="sol-2" onclick="pickSol(this, 2)">
+          <div class="sol-top"><img class="sol-logo" src="https://brandlogos.net/wp-content/uploads/2025/10/solana-logo_brandlogos.net_0evmb-512x446.png" alt="SOL"/><span class="sol-val" id="sv-2">1</span></div>
+        </div>
+        <div class="sol-amt" id="sol-3" onclick="pickSol(this, 3)">
+          <div class="sol-top"><img class="sol-logo" src="https://brandlogos.net/wp-content/uploads/2025/10/solana-logo_brandlogos.net_0evmb-512x446.png" alt="SOL"/><span class="sol-val" id="sv-3">3</span></div>
+        </div>
+        <div class="sol-custom" id="sol-pencil" onclick="toggleEditPresets()" title="Edit presets">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-9 9H2v-3L11 2z"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /mb -->
+
+</div><!-- /modal -->
+</div><!-- /modal-wrap -->
+
+<!-- ════ ASCII POPUP ════ -->
+<div class="ascii-overlay" id="ascii-overlay" onclick="closeAscii(event)">
+  <div class="ascii-modal" id="ascii-modal">
+
+    <div class="ascii-head">
+      <div>
+        <div class="ascii-title">Text to ASCII Art</div>
+        <div class="ascii-sub">Generate an image from your ticker in 3 styles</div>
+      </div>
+      <div class="close-btn" onclick="closeAsciiDirect()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </div>
+    </div>
+
+    <div class="ascii-body">
+      <div class="fi-wrap" style="margin-bottom:14px">
+        <input class="fi" id="ascii-input" type="text" placeholder="Enter ticker…" maxlength="20"
+          oninput="renderAscii(this.value)"/>
+        <span class="fi-sfx" style="font-size:9px;color:var(--text-dim);pointer-events:none;font-family:monospace" id="ascii-count">0/20</span>
+      </div>
+
+      <div class="ascii-grid" id="ascii-grid">
+        <div class="ascii-card" id="ac-0" onclick="selectAscii(0)">
+          <canvas id="cv-0" class="ascii-canvas"></canvas>
+          <div class="ascii-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1,6 4,9 11,2"/></svg></div>
+        </div>
+        <div class="ascii-card" id="ac-1" onclick="selectAscii(1)">
+          <canvas id="cv-1" class="ascii-canvas"></canvas>
+          <div class="ascii-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1,6 4,9 11,2"/></svg></div>
+        </div>
+        <div class="ascii-card" id="ac-2" onclick="selectAscii(2)">
+          <canvas id="cv-2" class="ascii-canvas"></canvas>
+          <div class="ascii-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1,6 4,9 11,2"/></svg></div>
+        </div>
+      </div>
+
+      <button class="ascii-use" id="ascii-use" onclick="useAscii()" disabled>Use this image</button>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /overlay -->
+
+<script>
+/* Symbol sync */
+let syncEnabled = false;
+
+function toggleSync() {
+  syncEnabled = !syncEnabled;
+  const el = document.getElementById('sync-toggle');
+  el.classList.toggle('on', syncEnabled);
+  if (syncEnabled) doSync();
+}
+
+function autoSync() {
+  if (syncEnabled) doSync();
+}
+
+function doSync() {
+  const n = document.getElementById('fname').value;
+  const s = n.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,13);
+  document.getElementById('fsym').value = s;
+  document.getElementById('sc').textContent = s.length;
+}
+
+// disable auto-sync if user manually edits symbol
+document.getElementById('fsym').addEventListener('input', () => {
+  if (syncEnabled) {
+    syncEnabled = false;
+    document.getElementById('sync-toggle').classList.remove('on');
+  }
+});
+
+/* Toggle description */
+function toggleDesc() {
+  const el = document.getElementById('desc-expand');
+  const chev = document.getElementById('desc-chev');
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  chev.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+/* Platform */
+function pickPf(el) {
+  document.querySelectorAll('.pf').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* Options */
+function toggleOpt(row, expandId) {
+  const on = row.classList.toggle('on');
+  const ex = document.getElementById(expandId);
+  if (ex) ex.classList.toggle('show', on);
+}
+
+/* Dev buy — disabled until name + symbol filled */
+let presets = [0.1, 0.5, 1, 3];
+let editMode = false;
+
+function checkReadiness() {
+  const name = document.getElementById('fname').value.trim();
+  const sym  = document.getElementById('fsym').value.trim();
+  const row  = document.getElementById('sol-row');
+  if (name && sym) row.classList.remove('locked');
+  else row.classList.add('locked');
+}
+document.getElementById('fname').addEventListener('input', checkReadiness);
+document.getElementById('fsym').addEventListener('input', checkReadiness);
+checkReadiness();
+
+function pickSol(el, idx) {
+  if (editMode) return;
+  document.querySelectorAll('.sol-amt').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  // TODO: trigger deploy with presets[idx] SOL dev buy
+}
+
+function toggleEditPresets() {
+  editMode = !editMode;
+  const row    = document.getElementById('sol-row');
+  const pencil = document.getElementById('sol-pencil');
+
+  row.classList.toggle('editing', editMode);
+  pencil.classList.toggle('active', editMode);
+
+  for (let i = 0; i < 4; i++) {
+    const span = document.getElementById('sv-' + i);
+    const tile = document.getElementById('sol-' + i);
+
+    if (editMode) {
+      // Replace span with input
+      const inp = document.createElement('input');
+      inp.className = 'sol-pencil-input';
+      inp.type = 'number';
+      inp.step = '0.1';
+      inp.min = '0.01';
+      inp.value = presets[i];
+      inp.id = 'pi-' + i;
+      inp.onclick = e => e.stopPropagation();
+      inp.onblur = () => commitPreset(i);
+      inp.onkeydown = e => { if (e.key === 'Enter') inp.blur(); };
+      span.replaceWith(inp);
+      if (i === 0) setTimeout(() => inp.focus(), 50);
+    } else {
+      // Restore span
+      commitPreset(i);
+    }
+  }
+}
+
+function commitPreset(i) {
+  const inp = document.getElementById('pi-' + i);
+  if (!inp) return;
+  const val = parseFloat(inp.value);
+  if (!isNaN(val) && val > 0) presets[i] = val;
+  const span = document.createElement('span');
+  span.className = 'sol-val';
+  span.id = 'sv-' + i;
+  span.textContent = presets[i];
+  inp.replaceWith(span);
+}
+
+/* SOL amounts */
+function pickSol(el, idx) {
+  if (editMode) return;
+  document.querySelectorAll('.sol-amt').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+/* Image thumbs */
+function pickImg(el) {
+  document.querySelectorAll('.img-thumb').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function addImageThumb(src, selectIt = true) {
+  const thumbs = document.getElementById('img-thumbs');
+  const div = document.createElement('div');
+  div.className = 'img-thumb';
+  div.dataset.src = src;
+  div.onclick = function() { pickImg(this); };
+  div.innerHTML = `
+    <div style="width:100%;height:100%;background-image:url(${src});background-size:cover;background-position:center"></div>
+    <div class="check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1,6 4,9 11,2"/></svg></div>
+  `;
+  thumbs.appendChild(div);
+  if (selectIt) pickImg(div);
+}
+
+function triggerUpload() {
+  const i = document.createElement('input');
+  i.type = 'file'; i.accept = 'image/*';
+  i.onchange = () => {
+    const f = i.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = e => addImageThumb(e.target.result, true);
+    r.readAsDataURL(f);
+  };
+  i.click();
+}
+
+/* ── Coin image search (CoinGecko) ── */
+let csearchTimer = null;
+
+function debounceCSearch(val) {
+  clearTimeout(csearchTimer);
+  const q = val.trim();
+  const box = document.getElementById('csearch-results');
+  if (!q) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="gsearch-msg">Searching…</div>';
+  csearchTimer = setTimeout(() => doCSearch(q), 600);
+}
+
+async function doCSearch(q) {
+  const box = document.getElementById('csearch-results');
+  try {
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(q)}`
+    );
+    const data = await res.json();
+    const coins = (data.coins || []).filter(c => c.thumb && c.thumb !== 'missing_large.png').slice(0, 8);
+    if (coins.length === 0) {
+      box.innerHTML = '<div class="gsearch-msg">No coins found</div>';
+      return;
+    }
+    box.innerHTML = '';
+    coins.forEach(coin => {
+      const item = document.createElement('div');
+      item.className = 'gsearch-item';
+      item.title = coin.name;
+      const img = document.createElement('img');
+      img.src = coin.large || coin.thumb;
+      img.alt = coin.name;
+      img.loading = 'lazy';
+      item.appendChild(img);
+      item.onclick = () => {
+        addImageThumb(coin.large || coin.thumb, true);
+        document.getElementById('csearch-input').value = '';
+        box.innerHTML = '';
+      };
+      box.appendChild(item);
+    });
+  } catch(e) {
+    box.innerHTML = '<div class="gsearch-msg">Search unavailable</div>';
+  }
+}
+
+/* ── Image search (Wikipedia Commons — no CORS, no key) ── */
+let gsearchTimer = null;
+
+function debounceGSearch(val) {
+  clearTimeout(gsearchTimer);
+  const q = val.trim();
+  const box = document.getElementById('gsearch-results');
+  if (!q) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="gsearch-msg">Searching…</div>';
+  gsearchTimer = setTimeout(() => doGSearch(q), 600);
+}
+
+async function doGSearch(q) {
+  const box = document.getElementById('gsearch-results');
+  try {
+    // Search Wikimedia Commons for images
+    const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrnamespace=6&prop=imageinfo&iiprop=url|thumburl|mime&iiurlwidth=150&format=json&origin=*&gsrlimit=12`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const pages = data.query && data.query.pages ? Object.values(data.query.pages) : [];
+    const imgs = pages
+      .filter(p => p.imageinfo && p.imageinfo[0] && p.imageinfo[0].thumburl &&
+        (p.imageinfo[0].mime || '').startsWith('image/'))
+      .slice(0, 8);
+
+    if (imgs.length === 0) {
+      box.innerHTML = '<div class="gsearch-msg">No results found</div>';
+      return;
+    }
+    box.innerHTML = '';
+    imgs.forEach(p => {
+      const info = p.imageinfo[0];
+      const item = document.createElement('div');
+      item.className = 'gsearch-item';
+      const img = document.createElement('img');
+      img.src = info.thumburl;
+      img.loading = 'lazy';
+      item.appendChild(img);
+      item.onclick = () => {
+        addImageThumb(info.url, true);
+        document.getElementById('gsearch-input').value = '';
+        box.innerHTML = '';
+      };
+      box.appendChild(item);
+    });
+  } catch(e) {
+    box.innerHTML = '<div class="gsearch-msg">Search unavailable</div>';
+  }
+}
+
+/* Drag & drop on drop zone */
+document.getElementById('drop-zone').addEventListener('dragover', e => {
+  e.preventDefault();
+  document.getElementById('drop-zone').style.borderColor = 'var(--border-hi)';
+});
+document.getElementById('drop-zone').addEventListener('dragleave', () => {
+  document.getElementById('drop-zone').style.borderColor = '';
+});
+document.getElementById('drop-zone').addEventListener('drop', e => {
+  e.preventDefault();
+  document.getElementById('drop-zone').style.borderColor = '';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) {
+    const r = new FileReader();
+    r.onload = ev => addImageThumb(ev.target.result, true);
+    r.readAsDataURL(f);
+  }
+});
+
+/* ── ASCII popup ── */
+let selectedAscii = -1;
+
+const asciiStyles = [
+  // Style 0 — Bold white on black
+  (ctx, w, h, text) => {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, w, h);
+    const sz = Math.min(w / (text.length * 0.65), h * 0.55);
+    ctx.font = `900 ${sz}px 'DM Sans', sans-serif`;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, w/2, h/2);
+  },
+  // Style 1 — Outlined on dark
+  (ctx, w, h, text) => {
+    ctx.fillStyle = '#0f0f11';
+    ctx.fillRect(0, 0, w, h);
+    const sz = Math.min(w / (text.length * 0.65), h * 0.52);
+    ctx.font = `800 ${sz}px 'DM Sans', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = sz * 0.06;
+    ctx.strokeText(text, w/2, h/2);
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillText(text, w/2, h/2);
+  },
+  // Style 2 — White on grey gradient
+  (ctx, w, h, text) => {
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#1a1a1f');
+    grad.addColorStop(1, '#2a2a35');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    const sz = Math.min(w / (text.length * 0.65), h * 0.52);
+    ctx.font = `700 ${sz}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const tg = ctx.createLinearGradient(0, h*0.3, w, h*0.7);
+    tg.addColorStop(0, '#ffffff');
+    tg.addColorStop(1, 'rgba(255,255,255,0.5)');
+    ctx.fillStyle = tg;
+    ctx.fillText(text, w/2, h/2);
+  }
+];
+
+function openAscii() {
+  const ticker = (document.getElementById('fsym').value || document.getElementById('fname').value || 'TOKEN').toUpperCase();
+  document.getElementById('ascii-input').value = ticker;
+  document.getElementById('ascii-count').textContent = ticker.length + '/20';
+  selectedAscii = -1;
+  document.querySelectorAll('.ascii-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('ascii-use').disabled = true;
+  document.getElementById('ascii-overlay').classList.add('show');
+  renderAscii(ticker);
+}
+
+function closeAscii(e) {
+  if (e.target === document.getElementById('ascii-overlay')) closeAsciiDirect();
+}
+function closeAsciiDirect() {
+  document.getElementById('ascii-overlay').classList.remove('show');
+}
+
+function renderAscii(raw) {
+  const text = (raw || 'TOKEN').toUpperCase().slice(0, 20);
+  document.getElementById('ascii-count').textContent = text.length + '/20';
+  asciiStyles.forEach((fn, i) => {
+    const canvas = document.getElementById('cv-' + i);
+    const size = 300;
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    fn(ctx, size, size, text);
+  });
+}
+
+function selectAscii(i) {
+  selectedAscii = i;
+  document.querySelectorAll('.ascii-card').forEach((c, idx) => c.classList.toggle('sel', idx === i));
+  document.getElementById('ascii-use').disabled = false;
+}
+
+function useAscii() {
+  if (selectedAscii < 0) return;
+  const canvas = document.getElementById('cv-' + selectedAscii);
+  const dataUrl = canvas.toDataURL('image/png');
+  addImageThumb(dataUrl, true);
+  closeAsciiDirect();
+}
+</script>
+</body>
+</html>
